@@ -36,13 +36,15 @@ jobs:
       - name: 4. Build Docker image
         shell: powershell
         run: |
-          docker build -t $env:IMAGE_NAME:latest .
+          $image = "$env:IMAGE_NAME" + ":latest"
+          docker build -t $image .
 
       - name: 5. Run container test
         shell: powershell
         run: |
+          $image = "$env:IMAGE_NAME" + ":latest"
           docker rm -f c-test-container 2>$null
-          docker run --name c-test-container $env:IMAGE_NAME:latest > output.txt
+          docker run --name c-test-container $image > output.txt
           Get-Content output.txt
           Select-String -Path output.txt -Pattern "sum = 30"
           docker rm -f c-test-container
@@ -50,7 +52,8 @@ jobs:
       - name: 6. Push image to GHCR
         shell: powershell
         run: |
-          docker push $env:IMAGE_NAME:latest
+          $image = "$env:IMAGE_NAME" + ":latest"
+          docker push $image
 
       - name: 7. Deploy with Docker Compose
         shell: powershell
@@ -62,4 +65,3 @@ jobs:
       - name: 8. Verify running container
         shell: powershell
         run: docker ps
-
