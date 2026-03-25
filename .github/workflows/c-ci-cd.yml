@@ -43,7 +43,8 @@ jobs:
         shell: powershell
         run: |
           $image = "$env:IMAGE_NAME" + ":latest"
-          docker rm -f c-test-container 2>$null
+          docker rm -f c-test-container
+          if ($LASTEXITCODE -ne 0) { Write-Host "No container to remove, continuing..." }
           docker run --name c-test-container $image > output.txt
           Get-Content output.txt
           Select-String -Path output.txt -Pattern "sum = 30"
